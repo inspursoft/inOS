@@ -9,13 +9,13 @@ Install CentOS-7-1611 on computer in "minimal" mode
 
 ## Step 2: Clone code for build inOS with docker
 
-	`$ git clone https://github.com/inspursoft/inOS.git`
+	$ git clone https://github.com/inspursoft/inOS.git
 
 ## Step 3: Build inOS with docker
 
-        `$ cd inOS`
-        `./inOS-docker.build.sh`
-
-      waiting automation build inOS image.
+        $ cd inOS
+        $ ./inOS-docker.build.sh
+	
+Waiting for automated build inOS image.
 
 ## Step 4: Reboot system and select "inOS-docker"
