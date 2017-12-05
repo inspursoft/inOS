@@ -1,4 +1,5 @@
 #!/bin/bash 
+: ${root_password='inspuros'}
 
 yum -y install wget libvirt* yum-utils
 yum -y groupinstall "Development" 
@@ -32,11 +33,14 @@ wget -c https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm &
 
 yum  -y install lxc*
 
+setenforce 0
 lxc-create --name docker -t /usr/share/lxc/templates/lxc-centos
+echo "root:$root_password" | chroot /var/lib/lxc/docker/rootfs chpasswd
 
 yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 cp /etc/yum.repos.d/docker-ce.repo /var/lib/lxc/docker/rootfs/etc/yum.repos.d/
 yum -y --installroot=/var/lib/lxc/docker/rootfs install docker-ce
+sed -i '/^SELINUX=/s/enforcing/disabled/g' /var/lib/lxc/docker/rootfs/etc/selinux/config
 
 yum -y --installroot=/var/lib/lxc/docker/rootfs install ~/rpmbuild/RPMS/x86_64/kernel-3.10.0-693.5.2.el7.x86_64.rpm
 
@@ -67,3 +71,5 @@ sed -i '$a\    linux /vmlinuz-3.10.0-693.5.2.el7.x86_64 ramdisk_size=4194304 qui
 sed -i '$a\    initrd /initrd.image.gz' /boot/grub2/grub.cfg
 sed -i '$a\}' /boot/grub2/grub.cfg
 
+echo "Now you can reboot your system and enter inOS-docker"
+echo "The inOS-docker root password:$root_password"
