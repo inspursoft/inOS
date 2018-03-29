@@ -1,0 +1,18 @@
+#!/bin/bash
+
+## Set the target image
+## Can be docker/kubemaster/kubenode
+TARGET=docker
+
+MASTERIP=
+NODEIP=
+ROOTPW=123456a?
+
+KUBEVER=`curl https://github.com/kubernetes/kubernetes/releases/latest 2>/dev/null | grep -oP '(?<=releases/tag/)[^"]*'`
+KUBEDOWNURL="https://github.com/kubernetes/kubernetes/releases/download/${KUBEVER}/kubernetes.tar.gz"
+#KUBESERVERBINPATH=${WORKDIR}/kubernetes/server/bin
+
+. ./inOS-download-k8s.sh
+. ./inOS-rootfs.sh
+. ./inOS-initrd.sh
+. ./inOS-grub.sh
