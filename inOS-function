@@ -12,7 +12,10 @@ KUBEVER=`curl https://github.com/kubernetes/kubernetes/releases/latest 2>/dev/nu
 KUBEDOWNURL="https://github.com/kubernetes/kubernetes/releases/download/${KUBEVER}/kubernetes.tar.gz"
 #KUBESERVERBINPATH=${WORKDIR}/kubernetes/server/bin
 
-. ./inOS-download-k8s.sh
+ROOTFSPATH="/var/lib/lxc/docker/rootfs"
+INITRDPATH="/var/lib/lxc/first/rootfs"
+
+. ./inOS-k8s.sh
 . ./inOS-rootfs.sh
 . ./inOS-initrd.sh
 . ./inOS-grub.sh
