@@ -39,9 +39,9 @@ popd
 function createloadimagesconfig {
 cat > ${ROOTFSPATH}/usr/bin/inOS-loadimages << EOF
 #!/bin/bash
-for image in `ls /var/lib/inOS/images/*`
+for image in \`ls /var/lib/inOS/images/*\`
 do
-docker load -i $image
+docker load -i \$image
 done
 EOF
 chmod +x ${ROOTFSPATH}/usr/bin/inOS-loadimages
