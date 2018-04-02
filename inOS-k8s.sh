@@ -11,6 +11,18 @@ cp images/*.tar ${ROOTFSPATH}/var/lib/inOS/images
 cp kubernetes/server/bin/{kubelet,kubectl} ${ROOTFSPATH}/usr/bin
 }
 
+function copyk8snode {
+mkdir -p ${ROOTFSPATH}/etc/kubernetes/{manifests,certs}
+mkdir -p ${ROOTFSPATH}/var/lib/inOS/images
+mkdir -p ${ROOTFSPATH}/opt/cni/bin
+
+cp images/*.tar ${ROOTFSPATH}/var/lib/inOS/images
+cp kubernetes/server/bin/{kubelet,kubectl,kube-proxy} ${ROOTFSPATH}/usr/bin
+cp bin/* ${ROOTFSPATH}/opt/cni/bin
+
+sed -i '/ExecStart/s/$/ --iptables=false/' ${ROOTFSPATH}/usr/lib/systemd/system/docker.service
+}
+
 function createkubeletconfig {
 cat > ${ROOTFSPATH}/usr/lib/systemd/system/kubelet.service << EOF
 [Unit]
@@ -33,6 +45,86 @@ EOF
 mkdir -p ${ROOTFSPATH}/var/lib/kubelet
 pushd ${ROOTFSPATH}/etc/systemd/system/multi-user.target.wants/
 ln -sv /usr/lib/systemd/system/kubelet.service kubelet.service
+popd
+}
+
+function createkubeletandkubeproxyconfig {
+cat > ${ROOTFSPATH}/usr/lib/systemd/system/kubelet.service << EOF
+[Unit]
+Description=Kubernetes Kubelet Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=inOS-loadimages.service
+Requires=inOS-loadimages.service
+
+[Service]
+WorkingDirectory=/var/lib/kubelet
+EnvironmentFile=-/etc/kubernetes/config
+EnvironmentFile=-/etc/kubernetes/kubelet
+ExecStart=/usr/bin/kubelet --pod-manifest-path /etc/kubernetes/manifests --fail-swap-on=false --network-plugin kubenet --hostname-override=${NODEIP} --allow-privileged=true --kubeconfig /etc/kubernetes/kubeletconfig.yaml
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > ${ROOTFSPATH}/usr/lib/systemd/system/kube-proxy.service << EOF
+[Unit]
+Description=Kubernetes Kubelet Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=inOS-loadimages.service
+Requires=inOS-loadimages.service
+
+[Service]
+WorkingDirectory=/var/lib/kubelet
+EnvironmentFile=-/etc/kubernetes/config
+EnvironmentFile=-/etc/kubernetes/kubelet
+ExecStart=/usr/bin/kube-proxy --kubeconfig /etc/kubernetes/kubeproxyconfig.yaml
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > ${ROOTFSPATH}/etc/kubernetes/kubeletconfig.yaml << EOF
+apiVersion: v1
+clusters:
+- cluster:
+    server: http://${MASTERIP}:8080
+  name: local
+contexts:
+- context:
+    cluster: local
+    user: kubelet
+  name: kubelet-context
+current-context: kubelet-context
+kind: Config
+preferences: {}
+users:
+- name: kubelet
+EOF
+
+cat > ${ROOTFSPATH}/etc/kubernetes/kubeproxyconfig.yaml << EOF
+apiVersion: v1
+clusters:
+- cluster:
+    server: http://${MASTERIP}:8080
+  name: local
+contexts:
+- context:
+    cluster: local
+    user: kube-proxy
+  name: kube-proxy-context
+current-context: kube-proxy-context
+kind: Config
+preferences: {}
+users:
+- name: kube-proxy
+EOF
+
+mkdir -p ${ROOTFSPATH}/var/lib/kubelet
+pushd ${ROOTFSPATH}/etc/systemd/system/multi-user.target.wants/
+ln -sv /usr/lib/systemd/system/kubelet.service kubelet.service
+ln -sv /usr/lib/systemd/system/kube-proxy.service kube-proxy.service
 popd
 }
 
@@ -315,8 +407,14 @@ EOF
 function buildk8senvironment {
 echo "Build the kubernetes enviroment"
 downloadk8sbinary
+if [ ${TARGET} = "kubemaster" ]
+then
 copyk8smaster
 createkubeletconfig
-createloadimagesconfig
 createmanifestsconfig
+else
+copyk8snode
+createkubeletandkubeproxyconfig
+fi
+createloadimagesconfig
 }
