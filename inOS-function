@@ -9,7 +9,7 @@ NODEIP=
 ROOTPW=123456a?
 
 KUBEVER=`curl https://github.com/kubernetes/kubernetes/releases/latest 2>/dev/null | grep -oP '(?<=releases/tag/)[^"]*'`
-KUBEDOWNURL="https://github.com/kubernetes/kubernetes/releases/download/${KUBEVER}/kubernetes.tar.gz"
+KUBEDOWNURL="https://dl.k8s.io/${KUBEVER}/kubernetes.tar.gz"
 #KUBESERVERBINPATH=${WORKDIR}/kubernetes/server/bin
 
 ROOTFSPATH="/var/lib/lxc/docker/rootfs"
