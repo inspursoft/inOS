@@ -1,5 +1,5 @@
 #!/bin/bash
-yum -y install libvirt* yum-utils epel-release
+yum -y install libvirt* yum-utils epel-release genisoimage syslinux
 yum -y install lxc*
 
 #yum -y --installroot=/var/lib/lxc/install/rootfs --disablerepo=* --enablerepo=inos install anaconda-core tmux libvirt* yum-utils epel-release
@@ -7,7 +7,7 @@ yum -y install lxc*
 lxc-create --name iso -t /usr/share/lxc/templates/lxc-centos
 
 #pushd /var/lib/lxc/iso/rootfs/etc/yum.repos.d
-yum -y --installroot=/var/lib/lxc/iso/rootfs install parted grub2-tools kernel anaconda-core tmux xfsprogs grub2-pc-modules syslinux genisoimage
+yum -y --installroot=/var/lib/lxc/iso/rootfs install parted grub2-tools kernel anaconda-core tmux xfsprogs grub2-pc-modules
 pushd /var/lib/lxc/iso/rootfs/etc/systemd/system/
 unlink default.target
 ln -sv /usr/lib/systemd/system/anaconda.target default.target

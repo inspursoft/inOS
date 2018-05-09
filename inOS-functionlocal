@@ -4,7 +4,7 @@
 ## Can be docker/kubemaster/kubenode
 
 ROOTPW=123456a?
-DISKNAME="/dev/sdb"
+DISKNAME="/dev/sda"
 
 ROOTFSPATH="/mnt/rootfs"
 INITRDPATH="/mnt/initrd"
