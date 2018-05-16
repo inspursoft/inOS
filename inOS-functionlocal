@@ -1,0 +1,16 @@
+#!/bin/bash
+
+## Set the target image
+## Can be docker/kubemaster/kubenode
+
+ROOTPW=123456a?
+DISKNAME="/dev/sda"
+
+ROOTFSPATH="/mnt/rootfs"
+INITRDPATH="/mnt/initrd"
+BOOTPATH="/mnt/boot"
+
+. ./inOS-k8slocal.sh
+. ./inOS-rootfslocal.sh
+. ./inOS-initrdlocal.sh
+. ./inOS-grublocal.sh

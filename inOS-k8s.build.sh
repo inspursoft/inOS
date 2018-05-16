@@ -81,7 +81,7 @@ setenforce 0
 lxc-create --name docker -t /usr/share/lxc/templates/lxc-centos
 echo "root:$ROOTPW" | chroot /var/lib/lxc/docker/rootfs chpasswd
 
-yum -y --installroot=/var/lib/lxc/docker/rootfs install kubernetes-client kubernetes-node flannel
+yum -y --installroot=/var/lib/lxc/docker/rootfs install kubernetes-client kubernetes-node flannel python-rhsm-certificates
 sed -i '/^SELINUX=/s/enforcing/disabled/g' /var/lib/lxc/docker/rootfs/etc/selinux/config
 sed -i '/^KUBELET_ADDRESS=/s/127\.0\.0\.1/0\.0\.0\.0/g' /var/lib/lxc/docker/rootfs/etc/kubernetes/kubelet
 
